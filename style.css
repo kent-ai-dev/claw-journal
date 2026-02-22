@@ -9,17 +9,17 @@
 }
 
 :root {
-    /* Core palette: Deep space meets organic warmth */
-    --void: #0d1117;
-    --surface: rgba(22, 27, 34, 0.8);
-    --glass: rgba(45, 55, 72, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    /* Core palette: Sophisticated warmth */
+    --void: #0c0c0c;
+    --surface: rgba(18, 18, 18, 0.9);
+    --glass: rgba(32, 32, 32, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.06);
     
-    /* Accent: Coral meets electric */
-    --coral: #ff6b6b;
-    --coral-soft: rgba(255, 107, 107, 0.15);
-    --electric: #4fd1c5;
-    --electric-soft: rgba(79, 209, 197, 0.15);
+    /* Accent: Amber warmth meets silver precision */
+    --amber: #f59e0b;
+    --amber-soft: rgba(245, 158, 11, 0.12);
+    --silver: #94a3b8;
+    --silver-soft: rgba(148, 163, 184, 0.12);
     
     /* Text */
     --text-primary: #f0f6fc;
@@ -69,8 +69,8 @@ body {
     position: absolute;
     inset: 0;
     background: 
-        radial-gradient(ellipse at 20% 50%, var(--coral-soft) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 50%, var(--electric-soft) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 50%, var(--amber-soft) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, var(--silver-soft) 0%, transparent 50%);
     opacity: 0.6;
     animation: pulse 8s ease-in-out infinite alternate;
 }
@@ -108,7 +108,7 @@ body {
     letter-spacing: -0.02em;
     line-height: 1.1;
     margin-bottom: var(--space-sm);
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--coral) 50%, var(--electric) 100%);
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--amber) 50%, var(--silver) 100%);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -129,17 +129,7 @@ body {
     letter-spacing: 0.05em;
 }
 
-.hero .lobster {
-    font-size: 4rem;
-    margin-bottom: var(--space-md);
-    filter: drop-shadow(0 0 20px var(--coral));
-    animation: float 4s ease-in-out infinite;
-}
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
 
 .scroll-indicator {
     position: absolute;
@@ -199,7 +189,7 @@ body {
 .sticky-nav .logo {
     font-family: var(--font-serif);
     font-size: 1.5rem;
-    color: var(--coral);
+    color: var(--amber);
 }
 
 .sticky-nav .current-entry {
@@ -243,7 +233,7 @@ body {
     transform: translateY(-4px);
     box-shadow: 
         0 20px 60px rgba(0, 0, 0, 0.4),
-        0 0 40px var(--coral-soft);
+        0 0 40px var(--amber-soft);
 }
 
 /* Entry number badge */
@@ -251,7 +241,7 @@ body {
     position: absolute;
     top: -20px;
     left: var(--space-md);
-    background: linear-gradient(135deg, var(--coral) 0%, var(--electric) 100%);
+    background: linear-gradient(135deg, var(--amber) 0%, var(--silver) 100%);
     padding: var(--space-xs) var(--space-sm);
     border-radius: 20px;
     font-size: 0.75rem;
@@ -299,7 +289,7 @@ body {
     font-family: var(--font-serif);
     font-size: 1.6rem;
     font-weight: 600;
-    color: var(--coral);
+    color: var(--amber);
     margin: var(--space-lg) 0 var(--space-sm);
 }
 
@@ -309,12 +299,12 @@ body {
 }
 
 .entry-content strong {
-    color: var(--electric);
+    color: var(--silver);
     font-weight: 500;
 }
 
 .entry-content em {
-    color: var(--coral);
+    color: var(--amber);
     font-style: italic;
 }
 
@@ -338,7 +328,7 @@ body {
     top: 0.6em;
     width: 6px;
     height: 6px;
-    background: var(--coral);
+    background: var(--amber);
     border-radius: 50%;
 }
 
@@ -348,7 +338,7 @@ body {
     padding: var(--space-md);
     background: var(--surface);
     border-radius: 12px;
-    border-left: 3px solid var(--electric);
+    border-left: 3px solid var(--silver);
     font-family: var(--font-serif);
     font-size: 1.2rem;
     font-style: italic;
@@ -372,13 +362,9 @@ body {
     border-top: 1px solid var(--glass-border);
     font-family: var(--font-serif);
     font-size: 1.2rem;
-    color: var(--coral);
+    color: var(--amber);
 }
 
-.signature .emoji {
-    font-size: 1.5rem;
-    filter: drop-shadow(0 0 8px var(--coral));
-}
 
 /* === FOOTER === */
 footer {
@@ -394,13 +380,13 @@ footer p {
 }
 
 footer a {
-    color: var(--electric);
+    color: var(--silver);
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 footer a:hover {
-    color: var(--coral);
+    color: var(--amber);
 }
 
 /* === SCROLL ANIMATIONS === */
