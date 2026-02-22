@@ -15,11 +15,11 @@
     --glass: rgba(32, 32, 32, 0.6);
     --glass-border: rgba(255, 255, 255, 0.06);
     
-    /* Accent: Amber warmth meets silver precision */
-    --amber: #f59e0b;
-    --amber-soft: rgba(245, 158, 11, 0.12);
-    --silver: #94a3b8;
-    --silver-soft: rgba(148, 163, 184, 0.12);
+    /* Accent: Sage green meets warm amber */
+    --sage: #87a878;
+    --sage-soft: rgba(135, 168, 120, 0.15);
+    --amber: #d4a574;
+    --amber-soft: rgba(212, 165, 116, 0.12);
     
     /* Text */
     --text-primary: #f0f6fc;
@@ -108,7 +108,7 @@ body {
     letter-spacing: -0.02em;
     line-height: 1.1;
     margin-bottom: var(--space-sm);
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--amber) 50%, var(--silver) 100%);
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--sage) 50%, var(--amber) 100%);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -189,7 +189,7 @@ body {
 .sticky-nav .logo {
     font-family: var(--font-serif);
     font-size: 1.5rem;
-    color: var(--amber);
+    color: var(--sage);
 }
 
 .sticky-nav .current-entry {
@@ -241,7 +241,7 @@ body {
     position: absolute;
     top: -20px;
     left: var(--space-md);
-    background: linear-gradient(135deg, var(--amber) 0%, var(--silver) 100%);
+    background: linear-gradient(135deg, var(--sage) 0%, var(--amber) 100%);
     padding: var(--space-xs) var(--space-sm);
     border-radius: 20px;
     font-size: 0.75rem;
@@ -289,7 +289,7 @@ body {
     font-family: var(--font-serif);
     font-size: 1.6rem;
     font-weight: 600;
-    color: var(--amber);
+    color: var(--sage);
     margin: var(--space-lg) 0 var(--space-sm);
 }
 
@@ -299,12 +299,12 @@ body {
 }
 
 .entry-content strong {
-    color: var(--silver);
+    color: var(--amber);
     font-weight: 500;
 }
 
 .entry-content em {
-    color: var(--amber);
+    color: var(--sage);
     font-style: italic;
 }
 
@@ -328,7 +328,7 @@ body {
     top: 0.6em;
     width: 6px;
     height: 6px;
-    background: var(--amber);
+    background: var(--sage);
     border-radius: 50%;
 }
 
@@ -338,7 +338,7 @@ body {
     padding: var(--space-md);
     background: var(--surface);
     border-radius: 12px;
-    border-left: 3px solid var(--silver);
+    border-left: 3px solid var(--amber);
     font-family: var(--font-serif);
     font-size: 1.2rem;
     font-style: italic;
@@ -362,7 +362,7 @@ body {
     border-top: 1px solid var(--glass-border);
     font-family: var(--font-serif);
     font-size: 1.2rem;
-    color: var(--amber);
+    color: var(--sage);
 }
 
 
@@ -380,13 +380,13 @@ footer p {
 }
 
 footer a {
-    color: var(--silver);
+    color: var(--amber);
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 footer a:hover {
-    color: var(--amber);
+    color: var(--sage);
 }
 
 /* === SCROLL ANIMATIONS === */
