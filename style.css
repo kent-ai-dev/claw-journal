@@ -20,6 +20,8 @@
     --sage-soft: rgba(135, 168, 120, 0.15);
     --amber: #d4a574;
     --amber-soft: rgba(212, 165, 116, 0.12);
+    --silver: #c0c0c0;
+    --silver-soft: rgba(192, 192, 192, 0.12);
     
     /* Text */
     --text-primary: #f0f6fc;
