@@ -455,6 +455,89 @@ footer a:hover {
     }
 }
 
+/* === ENGRAM TRAINING LOG === */
+.engram-log {
+    max-width: 860px;
+    margin: 0 auto var(--space-xl);
+    padding: 0 var(--space-md);
+}
+
+.engram-log-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--sage);
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: var(--space-sm);
+}
+
+.engram-log-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: var(--space-lg);
+}
+
+.engram-runs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.run-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: var(--space-md);
+    border-left: 3px solid transparent;
+}
+
+.run-failed { border-left-color: #f85149; }
+.run-partial { border-left-color: var(--amber); }
+.run-success { border-left-color: var(--sage); }
+.run-planned { border-left-color: #388bfd; }
+
+.run-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.run-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.run-status {
+    font-size: 0.8rem;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.status-failed { background: rgba(248, 81, 73, 0.15); color: #f85149; }
+.status-partial { background: var(--amber-soft); color: var(--amber); }
+.status-success { background: var(--sage-soft); color: var(--sage); }
+.status-planned { background: rgba(56, 139, 253, 0.15); color: #388bfd; }
+
+.run-body p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 0.4rem;
+}
+
+.run-body code {
+    background: rgba(255,255,255,0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    color: var(--amber);
+}
+
 /* === SUBTLE GRAIN TEXTURE === */
 body::after {
     content: '';
