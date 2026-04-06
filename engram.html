@@ -341,7 +341,7 @@
         <div class="arch-card">
             <h2>Architecture</h2>
             <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0.5rem;">
-                Engram is a small custom language model built from scratch — an <strong style="color: var(--amber);">AttentionBrain</strong> with multi-head self-attention over a sliding context window. It lives in the <a href="https://github.com/kent-ai-dev/engram" style="color: var(--sage); text-decoration: none;">kent-ai-dev/engram</a> repo and trains exclusively on SaladCloud GPU containers.
+                Engram is a small custom language model built from scratch — an <strong style="color: var(--amber);">AttentionBrain</strong> with multi-head self-attention over a sliding context window. It lives in the <a href="https://github.com/kent-ai-dev/engram" style="color: var(--sage); text-decoration: none;">kent-ai-dev/engram</a> repo. Training migrated from SaladCloud (preemption issues) to <strong style="color: var(--sage);">Modal.com</strong> (L4 GPU, no preemption) as of April 2026.
             </p>
 
             <div class="arch-grid">
@@ -367,11 +367,11 @@
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Training platform</span>
-                    <span class="stat-value">SaladCloud GPU</span>
+                    <span class="stat-value">Modal (L4 GPU)</span>
                 </div>
             </div>
 
-            <p class="arch-note">Weights stored on SaladCloud S4 (S3-compatible). Vocab grows with corpus — currently 7,253 tokens, expected to reach ~25,000–35,000 tokens on the full 13-book + DailyDialog corpus. Coherence penalty added in commit <code style="background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 4px; color: var(--amber);">5ae5950</code>.</p>
+            <p class="arch-note">Weights stored on Modal Volume (persistent). Vocab: <strong>37,591 tokens</strong> (full 13-book + DailyDialog corpus, trained Apr 6). Coherence penalty added in commit <code style="background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 4px; color: var(--amber);">5ae5950</code>.</p>
         </div>
     </section>
 
@@ -638,38 +638,137 @@
             <div class="run-entry run-active">
                 <div class="run-meta">
                     <div>
-                        <div class="run-title">Run 9 — IN PROGRESS</div>
+                        <div class="run-title">Run 9 — SaladCloud (stale)</div>
                         <div class="run-date">Mar 30, 2026 — 15:22 UTC</div>
+                    </div>
+                    <span class="run-badge badge-fail">❌ Unknown</span>
+                </div>
+                <p class="run-desc">
+                    Container <strong>engram-1774884158</strong> on SaladCloud. No confirmed completion — container likely preempted. This was the last SaladCloud-era run before the platform migration.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Platform</span>
+                        <span class="run-field-value">SaladCloud (deprecated)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Outcome</span>
+                        <span class="run-field-value">Unknown — no weights captured, container deleted</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Run 10: SaladCloud timeout -->
+            <div class="run-entry">
+                <div class="run-header">
+                    <div>
+                        <div class="run-title">Run 10 — SaladCloud Timeout (final SaladCloud run)</div>
+                        <div class="run-date">Apr 5, 2026 — 21:44 UTC</div>
+                    </div>
+                    <span class="run-badge badge-fail">❌ Timeout</span>
+                </div>
+                <p class="run-desc">
+                    Container <strong>engram-1775425431</strong> launched after cleaning 4 stale containers. Ran for 8.7 hours with 3 GPU node swaps (preemption). The polling script timed out at MAX_TRAINING_WAIT (28800s). An instance was briefly running near the end but no weights were ever produced. This was the decisive failure that triggered the migration to Modal.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Platform</span>
+                        <span class="run-field-value">SaladCloud (RTX 3060)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Duration</span>
+                        <span class="run-field-value">8.7 hours (timeout)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Node swaps</span>
+                        <span class="run-field-value">3 (GPU preemption)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Decision</span>
+                        <span class="run-field-value">Migrate to Modal.com — no preemption, reserved GPU</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Run 11: Modal 3-epoch SUCCESS -->
+            <div class="run-entry">
+                <div class="run-header">
+                    <div>
+                        <div class="run-title">Run 11 — Modal 3-Epoch (first Modal success)</div>
+                        <div class="run-date">Apr 6, 2026 — 08:00–09:02 UTC</div>
+                    </div>
+                    <span class="run-badge badge-success">✅ Success</span>
+                </div>
+                <p class="run-desc">
+                    <strong>First successful training on Modal.com.</strong> L4 GPU (24 GB VRAM), no preemption. Full corpus (13 books + DailyDialog, ~2.5M words), 3 epochs. Training completed in ~1 hour — compared to 8+ hours of failure on SaladCloud. All 3 weight files saved to Modal Volume and deployed to the live frontend. Vocab jumped from 7,253 → <strong>37,591 tokens</strong>.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    However, model output was still word salad — repeating "dissemble", "outlandish", "xxvii". Surprise score ~1.08 (high = random). The 37K vocab was too large for 3 epochs to converge. Led to launching a 10-epoch follow-up.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Platform</span>
+                        <span class="run-field-value">Modal.com (L4 GPU, 24 GB VRAM)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Duration</span>
+                        <span class="run-field-value">~1 hour</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Epochs</span>
+                        <span class="run-field-value">3</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Final loss</span>
+                        <span class="run-field-value">0.9751</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Vocab</span>
+                        <span class="run-field-value">37,591 tokens (was 7,253)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Weights</span>
+                        <span class="run-field-value">engram_weights.pth (1.6 MB), engram_memory_module.pth (18.4 MB), engram_word_to_id.pth (0.7 MB)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Deployed</span>
+                        <span class="run-field-value">Yes — frontend at 108.181.97.223:5000 serving vocab=37,591</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Cost</span>
+                        <span class="run-field-value">~$0.80 (L4 at $0.80/hr × 1h)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Run 12: Modal 10-epoch IN PROGRESS -->
+            <div class="run-entry">
+                <div class="run-header">
+                    <div>
+                        <div class="run-title">Run 12 — Modal 10-Epoch</div>
+                        <div class="run-date">Apr 6, 2026 — 09:34 UTC</div>
                     </div>
                     <span class="run-badge badge-active">⏳ In Progress</span>
                 </div>
                 <p class="run-desc">
-                    Container <strong>engram-1774884158</strong> launched at 15:22 UTC. Uses <code>python3 train_runner.py</code> (the fixed command). Coherence penalty added in commit <code>5ae5950</code>. This is the first run where all known bugs are patched simultaneously: ntfy double-quote fix (c35bd18), Windows path fix, correct entry-point script. Full corpus: 13 books + DailyDialog.
+                    Follow-up to Run 11 with 10 epochs (up from 3) to improve convergence. Same setup: Modal L4 GPU, full corpus. Expected ~3–4 hours. The attention gates need more passes to learn when n-gram memory helps vs. noise — 3 epochs wasn't enough for 37K vocab.
                 </p>
                 <div class="run-fields">
                     <div class="run-field">
-                        <span class="run-field-label">Container</span>
-                        <span class="run-field-value">engram-1774884158</span>
+                        <span class="run-field-label">Platform</span>
+                        <span class="run-field-value">Modal.com (L4 GPU)</span>
                     </div>
                     <div class="run-field">
-                        <span class="run-field-label">Launch time</span>
-                        <span class="run-field-value">Mar 30, 2026 15:22 UTC</span>
+                        <span class="run-field-label">Epochs</span>
+                        <span class="run-field-value">10</span>
                     </div>
                     <div class="run-field">
-                        <span class="run-field-label">Script</span>
-                        <span class="run-field-value"><code>python3 train_runner.py</code> (fixed)</span>
-                    </div>
-                    <div class="run-field">
-                        <span class="run-field-label">Corpus</span>
-                        <span class="run-field-value">13 books + DailyDialog — full corpus</span>
-                    </div>
-                    <div class="run-field">
-                        <span class="run-field-label">New this run</span>
-                        <span class="run-field-value">Coherence penalty (commit <code>5ae5950</code>); all prior bugs patched</span>
+                        <span class="run-field-label">Timeout</span>
+                        <span class="run-field-value">4 hours</span>
                     </div>
                     <div class="run-field">
                         <span class="run-field-label">Expected outcome</span>
-                        <span class="run-field-value">First genuine full-corpus training with new weights → S4 URL captured via ntfy</span>
+                        <span class="run-field-value">Lower loss, meaningful word associations, reduced surprise score</span>
                     </div>
                 </div>
             </div>
