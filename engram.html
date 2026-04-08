@@ -745,13 +745,13 @@
             <div class="run-entry">
                 <div class="run-header">
                     <div>
-                        <div class="run-title">Run 12 — Modal 10-Epoch</div>
+                        <div class="run-title">Run 12 — Modal 5-Epoch (8-layer upgrade)</div>
                         <div class="run-date">Apr 6, 2026 — 09:34 UTC</div>
                     </div>
-                    <span class="run-badge badge-active">⏳ In Progress</span>
+                    <span class="run-badge badge-success">✅ Complete</span>
                 </div>
                 <p class="run-desc">
-                    Follow-up to Run 11 with 10 epochs (up from 3) to improve convergence. Same setup: Modal L4 GPU, full corpus. Expected ~3–4 hours. The attention gates need more passes to learn when n-gram memory helps vs. noise — 3 epochs wasn't enough for 37K vocab.
+                    Upgraded architecture to 8 layers (from 3), 256 dimensions, 5 epochs. Training completed on Modal L4 GPU. Weights downloaded and deployed. Frontend serves vocab=37,591. <strong>Output quality is still poor</strong> — model produces grammatically-structured gibberish ("drawbridges tzatziki mammiferous"). Eval score: 56.4/100 (passes threshold but semantically meaningless). Deep analysis revealed: data bottleneck (13 Gutenberg books insufficient), single-head attention, contradictory ponder objectives, no gradient clipping.
                 </p>
                 <div class="run-fields">
                     <div class="run-field">
@@ -760,19 +760,39 @@
                     </div>
                     <div class="run-field">
                         <span class="run-field-label">Epochs</span>
-                        <span class="run-field-value">10</span>
+                        <span class="run-field-value">5 (8-layer, 256-dim)</span>
                     </div>
                     <div class="run-field">
                         <span class="run-field-label">Timeout</span>
-                        <span class="run-field-value">4 hours</span>
+                        <span class="run-field-value">~2 hours</span>
                     </div>
                     <div class="run-field">
                         <span class="run-field-label">Expected outcome</span>
-                        <span class="run-field-value">Lower loss, meaningful word associations, reduced surprise score</span>
+                        <span class="run-field-value">Complete — deployed, but output quality needs data + architecture fixes</span>
                     </div>
                 </div>
             </div>
 
+
+            <!-- Status: Deep Research Apr 8 -->
+            <div class="run-entry">
+                <div class="run-header">
+                    <div>
+                        <div class="run-title">Deep Research — Architecture Review &amp; Training Plan</div>
+                        <div class="run-date">Apr 8, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(136, 87, 255, 0.15); color: #a371f7;">🔬 Research</span>
+                </div>
+                <p class="run-desc">
+                    Full architecture analysis completed. Compared Engram to <strong>kent_hologram</strong> (Hyperdimensional Computing system). Identified 7 transferable techniques: surprise-gated learning, curriculum training, experience replay, output validation, ventriloquist dual-model generation, salience-weighted loss, and adaptive pondering.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Key finding:</strong> The gibberish problem is primarily a data problem. TinyStories (476M tokens, designed for small models) is the recommended unlock. Models under 10M params trained on TinyStories produce coherent stories — Engram is 18.7M params producing gibberish on Gutenberg books.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Next run plan:</strong> Fix 4 bugs (gradient clipping, ponder weight, evaluator contradiction, multi-head attention), then train on TinyStories + WikiText-2 curriculum for 20-30 epochs.
+                </p>
+            </div>
         </div><!-- end .run-cards -->
     </section>
 
