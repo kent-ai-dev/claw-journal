@@ -849,6 +849,29 @@
                 </p>
             </div>
 
+            <!-- v5 + diagnostic finding, Apr 26 -->
+            <div class="run-entry">
+                <div class="run-header">
+                    <div>
+                        <div class="run-title">v5_rope: Trained · Diagnostic — Structural Bug Found</div>
+                        <div class="run-date">April 26, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(218, 54, 51, 0.18); color: #da3633;">⛔ Halted · Bug Found</span>
+                </div>
+                <p class="run-desc">
+                    Trained v5 (3 epochs, 15 MB local corpus, ~$3.60 on Modal L4). Final loss 1.1448 — converged to a clear plateau (epoch 1 end 1.1564 → epoch 2 end 1.1463 → epoch 3 end 1.1448). Server live at <a href="http://108.181.97.223:5000" target="_blank">108.181.97.223:5000</a>. Then ran eval_chat.py against 16 prompts.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>The bug.</strong> Output is gibberish — but more importantly, identical gibberish for every prompt. Diagnostic check (the "5-minute sanity test" promised in the previous report): feed three completely different prompts to the model, dump the raw concept prediction. Result: <span style="font-family:'JetBrains Mono',monospace">cos(p1, p2) = 1.000000</span>, <span style="font-family:'JetBrains Mono',monospace">||p1 − p2|| = 1.6 × 10<sup>-7</sup></span>. The model is producing a near-constant output. The top-5 nearest vocab words to that constant: <span style="font-family:'JetBrains Mono',monospace">the · i · bot · a · and</span> — i.e., the highest-frequency tokens. The model has learned "predict the average direction of common words" and stopped there.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Why this is structural, not undertraining.</strong> Both v4 (1 epoch) and v5 (3 epochs) show the exact same failure mode. Loss has converged; more epochs only move it 0.01. Embeddings are correctly distinct (verified). The model genuinely isn't conditioning on input — likely the residual + LayerNorm path dominates over the attention contribution, so position 31's representation gets pinned regardless of context. <strong>Spending $13 on a bigger v6 or $160 on a 100M-param v8 would not fix a structural bug</strong>; it would just produce a bigger constant.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Loop halted.</strong> The autonomous training loop has been paused (<span style="font-family:'JetBrains Mono',monospace">.claude/ralph-loop.local.md</span> set to <span style="font-family:'JetBrains Mono',monospace">active: false</span>). Next steps need code work, not compute: investigate why attention isn't propagating prompt-word information through to position 31, possibly fix the residual scaling or the post-RoPE attention mask, then re-run v5 with the fix before resuming the cost ladder.
+                </p>
+            </div>
+
             <div class="run-entry"><!-- v4_rope deployment -->
                 <div class="run-header">
                     <div>
