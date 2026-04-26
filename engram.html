@@ -826,6 +826,29 @@
                 </div>
             </div>
 
+            <!-- Plan: OpenMythos transfer + Autonomous Ralph Loop, Apr 25-26 -->
+            <div class="run-entry">
+                <div class="run-header">
+                    <div>
+                        <div class="run-title">Plan &amp; Implementation — OpenMythos Architecture Transfer + Autonomous Ralph Loop</div>
+                        <div class="run-date">April 25-26, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(136, 87, 255, 0.15); color: #a371f7;">📋 Plan</span>
+                </div>
+                <p class="run-desc">
+                    <strong>The plan.</strong> Inspired by <a href="https://github.com/kyegomez/OpenMythos" target="_blank"><span style="font-family:'JetBrains Mono',monospace">kyegomez/OpenMythos</span></a> — a Recurrent Depth Transformer reference implementation — I drafted <span style="font-family:'JetBrains Mono',monospace">plans/OPENMYTHOS_TRANSFER.md</span>, a six-phase ablation-first study to port four ideas from OpenMythos into Engram: (1) LTI-stable input injection, (2) loop-index sinusoidal embeddings, (3) inference-time depth extrapolation, (4) per-loop LoRA — plus an independent track for (5) RoPE positional encoding. Every phase had numeric pass/kill criteria gated on JSON metrics from a reproducible bench harness (<span style="font-family:'JetBrains Mono',monospace">bench/run.py</span>). No vibes — only loss/grad-norm/eval deltas decided whether a change shipped.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>The ralph loop.</strong> To execute the plan hands-off across many sessions, I configured the <a href="https://claude.com/plugins/ralph-loop" target="_blank">ralph-loop plugin</a> with completion-promise <span style="font-family:'JetBrains Mono',monospace">ENGRAM_OPENMYTHOS_TRANSFER_COMPLETE</span>. The loop iterates phase-by-phase, running tests on Modal L4 GPUs and committing decisions back to the engram repo. Each phase that passes ships its code; each that fails is reverted before moving on. Full mechanics documented in <span style="font-family:'JetBrains Mono',monospace">plans/AUTONOMOUS_LOOP.md</span>.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Results — only one of five ideas survived.</strong> LTI injection and loop-index embedding both <em>killed</em> (no measurable grad-norm or eval gain). Phases 3 and 4 skipped — their prerequisite chain was broken once Phases 1–2 failed. Only <strong>Phase 5 (RoPE)</strong> shipped: grad_norm_p99 halved 0.561→0.280 and the model maintained quality at 3× training context with zero quality cliff. RoPE is now locked as the default in <span style="font-family:'JetBrains Mono',monospace">engram_model.py</span> with zero extra trainable parameters.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>What's next.</strong> With the architecture transfer complete, the autonomous loop has been re-armed with completion-promise <span style="font-family:'JetBrains Mono',monospace">ENGRAM_COHERENT</span> — driving an iterated training campaign (v5 → v8) toward a model that produces actual coherent dialog instead of gibberish. v5 (3 epochs, 15 MB corpus, ~$3.60 on L4) is training right now. Full report and tier-by-tier cost roadmap: <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
+                </p>
+            </div>
+
             <div class="run-entry"><!-- v4_rope deployment -->
                 <div class="run-header">
                     <div>
