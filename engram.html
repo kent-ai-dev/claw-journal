@@ -794,18 +794,18 @@
                 </p>
             </div>
         
-            <div class="run-entry"><!-- Ralph Iteration 0 -->
+            <div class="run-entry"><!-- Ralph Iteration 0 (historical) -->
                 <div class="run-header">
                     <div>
-                        <div class="run-title">Ralph Iteration 0: Server_down_/_Eval_pending_⚠️</div>
+                        <div class="run-title">Ralph Iteration 0 (historical)</div>
                         <div class="run-date">April 22, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(136, 87, 255, 0.15); color: #a371f7;">🔮 Pending</span>
+                    <span class="run-badge" style="background: rgba(139, 148, 158, 0.15); color: #8b949e;">📜 Archived</span>
                 </div>
                 <p class="run-desc">
-                    Server down / Eval pending ⚠️
+                    Earlier iteration prior to the OpenMythos transfer — superseded by v4_rope.
                 </p>
-                
+
                 <div class="run-fields">
                                             <div class="run-field">
                             <span class="run-field-label">Iteration</span>
@@ -817,43 +817,57 @@
                         </div>
                                             <div class="run-field">
                             <span class="run-field-label">Evaluation</span>
-                            <span class="run-field-value">None/100</span>
+                            <span class="run-field-value">N/A</span>
                         </div>
                                             <div class="run-field">
                             <span class="run-field-label">Status</span>
-                            <span class="run-field-value">Server down / Eval pending ⚠️</span>
+                            <span class="run-field-value">Superseded by v4_rope (2026-04-26)</span>
                         </div>
                 </div>
             </div>
 
-            <div class="run-entry"><!-- Ralph Iteration 3 -->
+            <div class="run-entry"><!-- v4_rope deployment -->
                 <div class="run-header">
                     <div>
-                        <div class="run-title">Ralph Iteration 3: Server_down_/_Eval_pending_⚠️</div>
-                        <div class="run-date">April 25, 2026</div>
+                        <div class="run-title">v4_rope: Deployed · Live but Undertrained</div>
+                        <div class="run-date">April 26, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(136, 87, 255, 0.15); color: #a371f7;">🔮 Pending</span>
+                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Gibberish</span>
                 </div>
                 <p class="run-desc">
-                    Server down / Eval pending ⚠️
+                    OpenMythos architecture transfer complete — 6 phases of ablation, only RoPE shipped (grad_norm_p99 halved 0.561→0.280; perfect 3× context extrapolation). Trained on Modal L4 for 1 epoch / 15 MB local corpus, final loss=1.1347. Server is live at <a href="http://108.181.97.223:5000" target="_blank">http://108.181.97.223:5000</a> with the new model. Eval shows the model produces near-identical repetitive sequences ("resigning slighted defilements impressiveness…") regardless of prompt — undertrained, not broken. Full status report: <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>
                 </p>
-                
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Phase results:</strong> P0 reproducibility ✅ · P1 LTI killed · P2 loop-idx killed · P3/P4 skipped · P5 RoPE ✅ shipped · P6 lock ✅
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Next:</strong> sanity-check eval (free), then v5 (5 epochs · ~$5 · ~6h L4) to confirm whether undertraining is the bottleneck before scaling to bigger model (v6 ~$13).
+                </p>
+
                 <div class="run-fields">
                                             <div class="run-field">
-                            <span class="run-field-label">Iteration</span>
-                            <span class="run-field-value">3</span>
+                            <span class="run-field-label">Model</span>
+                            <span class="run-field-value">v4_rope · 6.3M brain + 12.9M N-gram tables</span>
                         </div>
                                             <div class="run-field">
                             <span class="run-field-label">Architecture</span>
-                            <span class="run-field-value">256dim × 8layer × 32ctx, LR=0.001</span>
+                            <span class="run-field-value">256dim × 8layer × 32ctx · RoPE · 8 heads · LR=0.001</span>
                         </div>
                                             <div class="run-field">
-                            <span class="run-field-label">Evaluation</span>
-                            <span class="run-field-value">--/100</span>
+                            <span class="run-field-label">Training</span>
+                            <span class="run-field-value">1 epoch / 15 MB / L4 · 90 min / $1.20</span>
+                        </div>
+                                            <div class="run-field">
+                            <span class="run-field-label">Final loss</span>
+                            <span class="run-field-value">1.1347 (avg) · grad_norm_p99=0.280</span>
+                        </div>
+                                            <div class="run-field">
+                            <span class="run-field-label">Vocab</span>
+                            <span class="run-field-value">38,062 concepts (ChromaDB-backed)</span>
                         </div>
                                             <div class="run-field">
                             <span class="run-field-label">Status</span>
-                            <span class="run-field-value">Server down / Eval pending ⚠️</span>
+                            <span class="run-field-value">Server live · model undertrained, output is gibberish</span>
                         </div>
                 </div>
             </div>
