@@ -849,14 +849,37 @@
                 </p>
             </div>
 
-            <!-- v6_preln + Pre-LN architecture fix, Apr 27 -->
+            <!-- v7_dialog: dailydialog-only test, Apr 27 -->
+            <div class="run-entry">
+                <div class="run-header">
+                    <div>
+                        <div class="run-title">v7_dialog: Cleaner Vocab, Still Gibberish — Data Artifacts Now Visible</div>
+                        <div class="run-date">April 27, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Data Artifacts</span>
+                </div>
+                <p class="run-desc">
+                    Tested the data hypothesis from v6's diagnosis: with the architecture bug fixed (Pre-LN + AdamW), would dropping the 19th-century novels give us coherent dialog? Trained v7 on <span style="font-family:'JetBrains Mono',monospace">corpus/dailydialog.txt</span> only (6.1 MB conversational, 5 epochs, ~$3 on Modal L4). Final loss <strong>1.0101</strong> — best yet (v6: 1.0509, v5: 1.1448). Vocab dropped from 38,062 → 18,187 concepts (the novels are gone).
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Diagnostic shows further improvement.</strong> <span style="font-family:'JetBrains Mono',monospace">cos(p1, p2) = 0.912</span> (was 0.960 in v6, 1.000 in v5). <span style="font-family:'JetBrains Mono',monospace">||p1 − p2|| = 4.51</span> (was 0.43 in v6) — <strong>10× more output differentiation</strong>. The model conditions on input even more strongly with the focused corpus.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>But output is still gibberish.</strong> Sample replies: <span style="font-family:'JetBrains Mono',monospace">"i user swear 106 236 i user doctor uncite the i bidpai bleu 236 to"</span>, <span style="font-family:'JetBrains Mono',monospace">"i rikknen laid uptight lock for i to rikknen batwoman and yw132 expanded"</span>. The Moby-Dick vocab is gone — replaced by <strong>data artifacts in dailydialog</strong>: numeric IDs (<span style="font-family:'JetBrains Mono',monospace">236, 106, 1205, yw132, 8826789</span>), placeholder tokens (<span style="font-family:'JetBrains Mono',monospace">rikknen, bidpai</span>), rare proper nouns (<span style="font-family:'JetBrains Mono',monospace">morrissette, pavarotti</span>). Common English IS in there (<span style="font-family:'JetBrains Mono',monospace">i, user, you, the, to, and, lending, doctor, good</span>) but drowned by noise tokens.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Diagnosis</strong>: dailydialog has preprocessing residue. Three options for v8: (a) clean the corpus first (regex out numeric IDs + low-frequency tokens), (b) bigger model — 50M params, more capacity to ignore noise, (c) different conversational corpus (Persona-Chat / OpenAssistant). Each architectural fix has worked exactly as predicted; quality has improved monotonically (v5 frozen → v6 conditions → v7 differentiates more) — but we keep finding new bottlenecks. Live at <a href="http://108.181.97.223:5000" target="_blank">108.181.97.223:5000</a>.
+                </p>
+            </div>
+
+            <!-- v6_preln + Pre-LN architecture fix, Apr 27 (now superseded) -->
             <div class="run-entry">
                 <div class="run-header">
                     <div>
                         <div class="run-title">v6_preln: Pre-LN Fix Worked — Constant-Output Bug Resolved</div>
                         <div class="run-date">April 27, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(35, 134, 54, 0.18); color: #238636;">✅ Bug Fixed · Quality Pending</span>
+                    <span class="run-badge" style="background: rgba(139, 148, 158, 0.15); color: #8b949e;">📜 Superseded by v7</span>
                 </div>
                 <p class="run-desc">
                     After v5's diagnostic localized the bug to block 0 of the trained model (attention softmax collapsed to near-uniform max=0.033, FF norm exploded to 360 vs residual 16), implemented two fixes:
