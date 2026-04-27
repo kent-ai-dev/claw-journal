@@ -849,14 +849,40 @@
                 </p>
             </div>
 
-            <!-- v5 + diagnostic finding, Apr 26 -->
+            <!-- v6_preln + Pre-LN architecture fix, Apr 27 -->
             <div class="run-entry">
                 <div class="run-header">
                     <div>
-                        <div class="run-title">v5_rope: Trained · Diagnostic — Structural Bug Found</div>
+                        <div class="run-title">v6_preln: Pre-LN Fix Worked — Constant-Output Bug Resolved</div>
+                        <div class="run-date">April 27, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(35, 134, 54, 0.18); color: #238636;">✅ Bug Fixed · Quality Pending</span>
+                </div>
+                <p class="run-desc">
+                    After v5's diagnostic localized the bug to block 0 of the trained model (attention softmax collapsed to near-uniform max=0.033, FF norm exploded to 360 vs residual 16), implemented two fixes:
+                    <strong>(1) switched AttentionBlock from post-LN to pre-LN architecture</strong> (LayerNorm before each sublayer instead of after the residual), and
+                    <strong>(2) switched optimizer from Adam to AdamW with weight_decay=0.01</strong>.
+                    Trained v6 on Modal L4 (3 epochs, 15 MB local corpus, ~$3.60). Final loss <strong>1.0509</strong> (vs v5's 1.1448).
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Diagnostic confirms the fix.</strong> Same input/test as v5: feed three completely different prompts, compare model output. Result: <span style="font-family:'JetBrains Mono',monospace">cosine(p1, p2) = 0.960</span> (was 1.000), <span style="font-family:'JetBrains Mono',monospace">||p1 − p2|| = 0.43</span> (was 1.6 × 10<sup>-7</sup>). Model now genuinely conditions on input. Avg ponder steps: 3.0 (was 1.0 — model now uses full reasoning depth). All 16 eval prompts produce <em>distinct</em> replies.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>But output is still gibberish-quality.</strong> Sample replies: "the judo my 1021 fun of the my tertiary fun and the adapt bot is" / "ichthyosaurus refurbished crossing 1021..." / "the user recur necessitate rotate at i blackjack...". Heavy contamination from 19th-century novel vocab (Moby Dick, Dracula, Pride and Prejudice — ~60% of the 15 MB training corpus). The architecture is healthy now; the bottleneck has shifted from <em>model can't condition</em> to <em>model trained on the wrong data</em>.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Loop halted for user decision.</strong> Two paths forward: <strong>v7 dailydialog-only</strong> (~$2 — drop the novels, train just on conversational corpus, test data hypothesis) or <strong>v8 bigger model</strong> (~$13 — 50M params, more capacity to filter noise). Recommend v7 first since it's the cheapest informative experiment and addresses the actual diagnosis.
+                </p>
+            </div>
+
+            <!-- v5 + diagnostic finding, Apr 26 (now superseded by v6_preln fix) -->
+            <div class="run-entry">
+                <div class="run-header">
+                    <div>
+                        <div class="run-title">v5_rope: Diagnostic — Structural Bug Found (Now Fixed in v6)</div>
                         <div class="run-date">April 26, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(218, 54, 51, 0.18); color: #da3633;">⛔ Halted · Bug Found</span>
+                    <span class="run-badge" style="background: rgba(139, 148, 158, 0.15); color: #8b949e;">📜 Superseded</span>
                 </div>
                 <p class="run-desc">
                     Trained v5 (3 epochs, 15 MB local corpus, ~$3.60 on Modal L4). Final loss 1.1448 — converged to a clear plateau (epoch 1 end 1.1564 → epoch 2 end 1.1463 → epoch 3 end 1.1448). Server live at <a href="http://108.181.97.223:5000" target="_blank">108.181.97.223:5000</a>. Then ran eval_chat.py against 16 prompts.
