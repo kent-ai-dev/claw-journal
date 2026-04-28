@@ -351,19 +351,19 @@
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Attention layers</span>
-                    <span class="stat-value">4</span>
+                    <span class="stat-value">12 (v9)</span>
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">embed_dim</span>
-                    <span class="stat-value">96</span>
+                    <span class="stat-value">384 (v9)</span>
                 </div>
                 <div class="arch-stat">
-                    <span class="stat-label">context window</span>
-                    <span class="stat-value">32 tokens</span>
+                    <span class="stat-label">Brain params</span>
+                    <span class="stat-value">~21.5M (v9)</span>
                 </div>
                 <div class="arch-stat">
-                    <span class="stat-label">NGRAM_TABLE_SIZE</span>
-                    <span class="stat-value">50,021</span>
+                    <span class="stat-label">Vocab</span>
+                    <span class="stat-value">9,509 concepts</span>
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Training platform</span>
@@ -371,14 +371,14 @@
                 </div>
             </div>
 
-            <p class="arch-note">Weights stored on Modal Volume (persistent). Vocab: <strong>37,591 tokens</strong> (full 13-book + DailyDialog corpus, trained Apr 6). Coherence penalty added in commit <code style="background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 4px; color: var(--amber);">5ae5950</code>.</p>
+            <p class="arch-note">Active model: <strong>v9_dialog_big</strong> (live 2026-04-28 19:50 UTC). RoPE + Pre-LN + AdamW locked since v6. Vocab cleaned to 9,509 tokens (v8 corpus_clean.py removed numeric IDs and low-frequency tokens). Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
         </div>
     </section>
 
     <!-- Run Log -->
     <section class="run-log-section">
         <h2 class="section-header">Run History</h2>
-        <p class="section-sub">10 runs (+ pre-history) across ~12 days. Same architecture. Many bugs. Getting closer.</p>
+        <p class="section-sub">12 runs (+ pre-history) across ~40 days. Architecture stable since v6. Bottleneck shifted: data, not capacity.</p>
 
         <div class="run-cards">
 
@@ -873,6 +873,87 @@
                 <p class="run-desc" style="margin-top: 0.5rem;">
                     <strong>What's still missing</strong>: word-salad-of-valid-words instead of coherent sentences. Topics drift mid-sentence (<span style="font-family:'JetBrains Mono',monospace">tonight → playstation → kiss</span> in one reply). Grammar is broken; no syntactic structure. Hypothesis for v9: <strong>bigger model (50M params, 384D, 12L)</strong> has the capacity to learn multi-word grammatical patterns instead of just word-level associations. v9 launching next, ~$13 on L4. v10 will add HuggingFaceTB/everyday-conversations-llama3.1-2k (clean Llama-generated dialogues) on top.
                 </p>
+            </div>
+
+            <!-- v10_dialog_big: in progress -->
+            <div class="run-entry run-active">
+                <div class="run-meta">
+                    <div>
+                        <div class="run-title">v10_dialog_big: Bigger Corpus — Training Pending</div>
+                        <div class="run-date">Apr 28, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(136, 87, 255, 0.15); color: #a371f7;">🔮 Pending</span>
+                </div>
+                <p class="run-desc">
+                    v9 proved that 3.5x more parameters on the same corpus does not unlock grammar. The diagnosis is clear: the cleaned dailydialog corpus (~6 MB, ~76K utterances) is too small and too repetitive. v10 keeps the v9 architecture (384D / 12L / 12H / RoPE / Pre-LN / 21.5M params) and merges in <code>HuggingFaceTB/everyday-conversations-llama3.1-2k</code> — clean Llama-generated dialogues downloaded via <code>download_everyday_conversations.py</code> (already in the repo). Kicking off shortly.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Architecture</span>
+                        <span class="run-field-value">Same as v9: 384D / 12L / 12H / RoPE / Pre-LN / AdamW</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Corpus change</span>
+                        <span class="run-field-value">dailydialog_clean.txt + everyday-conversations-llama3.1-2k</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Hypothesis</span>
+                        <span class="run-field-value">Corpus variety — not capacity — is the binding constraint on grammar</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Platform / Cost</span>
+                        <span class="run-field-value">Modal L4 · ~$4–5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v9_dialog_big: bigger model, same corpus, word salad persists -->
+            <div class="run-entry run-partial">
+                <div class="run-meta">
+                    <div>
+                        <div class="run-title">v9_dialog_big: More Params Did Not Fix Grammar</div>
+                        <div class="run-date">Apr 28, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Word Salad</span>
+                </div>
+                <p class="run-desc">
+                    Trained the biggest Engram model yet: 384 embed dim / 12 layers / 12 heads / head_dim=32 / RoPE / Pre-LN / AdamW — <strong>21.5M brain params</strong> (v8: ~6M, v6: ~6M). Same cleaned dailydialog corpus (9,509-token vocab). 5 epochs on Modal L4, ~$4. Trained 2026-04-28 12:32 UTC, live as of 2026-04-28 19:50 UTC. Full report at <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Eval results (eval_chat.py, 16 prompts):</strong> Criterion 1 (distinct outputs) PASS — 16/16 distinct. Criterion 2 (real English tokens) mostly pass — real words but with odd leaks (<code>ikebana, milliken, tornados, banquet</code>). Criterion 3 (coherent chitchat) FAIL — still word salad. Sample outputs:
+                    <br><code>"what do you like to do" → "you go to banquet present the bot smoke and starting i ll failed to the"</code>
+                    <br><code>"tell me about yourself" → "user reducing that happening slip i m it evil banquet bot you cortex it s"</code>
+                    <br><code>"how was your day" → "user reducing the me that i m dishwashing hi evil bot you festival it s"</code>
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Diagnosis:</strong> the v8 hypothesis ("bigger model has capacity to learn grammar") is refuted. Fragments emerge (<code>i am, i m, hi, i have a really</code>) but no coherent sentences. The bottleneck is the corpus — not the model. Next: v10 with a larger, more varied corpus.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Architecture</span>
+                        <span class="run-field-value">384D / 12L / 12H / RoPE / Pre-LN / AdamW</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Brain params</span>
+                        <span class="run-field-value">21,288,577 (~21.5M)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Vocab</span>
+                        <span class="run-field-value">9,509 (cleaned dailydialog)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Training</span>
+                        <span class="run-field-value">5 epochs · Modal L4 · ~$4 · 2026-04-28 12:32 UTC</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Eval</span>
+                        <span class="run-field-value">1/3 criteria: distinct PASS · english mostly · coherent FAIL</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Transcript</span>
+                        <span class="run-field-value"><code>eval_runs/chat_20260428_194533.json</code></span>
+                    </div>
+                </div>
             </div>
 
             <!-- v7_dialog: dailydialog-only test (now superseded) -->
