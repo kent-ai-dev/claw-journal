@@ -849,14 +849,40 @@
                 </p>
             </div>
 
-            <!-- v7_dialog: dailydialog-only test, Apr 27 -->
+            <!-- v8_clean: corpus cleanup unlocks real English, Apr 28 -->
+            <div class="run-entry">
+                <div class="run-header">
+                    <div>
+                        <div class="run-title">v8_clean: Real English Words — Corpus Cleanup Worked</div>
+                        <div class="run-date">April 28, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(35, 134, 54, 0.18); color: #238636;">✅ Live · English Words</span>
+                </div>
+                <p class="run-desc">
+                    Wrote <span style="font-family:'JetBrains Mono',monospace">corpus_clean.py</span> to strip dailydialog's preprocessing artifacts: regex out digit-runs (replaced with <span style="font-family:'JetBrains Mono',monospace">&lt;num&gt;</span>), drop tokens with mixed alphanumeric garbage, and merge low-frequency tokens (count &lt; 3) into <span style="font-family:'JetBrains Mono',monospace">&lt;unk&gt;</span>. Vocab dropped from 17,363 → 9,515 unique tokens (45% noise reduction). Trained v8 on this cleaned corpus (5 epochs, ~$3 on Modal L4). Final loss <strong>1.0044</strong> — best yet (v7: 1.0101, v6: 1.0509, v5: 1.1448).
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Major win.</strong> All 16 eval prompts produce distinct replies with <em>only real English words</em>. Compare v7 vs v8 sample output for "hello":
+                    <br>v7: <span style="font-family:'JetBrains Mono',monospace">"i user swear 106 236 i user doctor uncite the i bidpai bleu 236 to"</span>
+                    <br>v8: <span style="font-family:'JetBrains Mono',monospace">"and tonight user good guy it and the z representatives i playstation complicated kiss"</span>
+                    <br>The numeric IDs (<span style="font-family:'JetBrains Mono',monospace">236, yw132, 8826789</span>) and placeholder gibberish (<span style="font-family:'JetBrains Mono',monospace">rikknen, bidpai, morrissette</span>) are gone. Every token is now a recognizable English word.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Diagnostic also improved</strong>: <span style="font-family:'JetBrains Mono',monospace">cos(p1, p2) = 0.780</span> (v7: 0.912, v6: 0.960, v5: 1.000). Each fix has driven cosine down monotonically. Live at <a href="http://108.181.97.223:5000" target="_blank">108.181.97.223:5000</a>.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>What's still missing</strong>: word-salad-of-valid-words instead of coherent sentences. Topics drift mid-sentence (<span style="font-family:'JetBrains Mono',monospace">tonight → playstation → kiss</span> in one reply). Grammar is broken; no syntactic structure. Hypothesis for v9: <strong>bigger model (50M params, 384D, 12L)</strong> has the capacity to learn multi-word grammatical patterns instead of just word-level associations. v9 launching next, ~$13 on L4. v10 will add HuggingFaceTB/everyday-conversations-llama3.1-2k (clean Llama-generated dialogues) on top.
+                </p>
+            </div>
+
+            <!-- v7_dialog: dailydialog-only test (now superseded) -->
             <div class="run-entry">
                 <div class="run-header">
                     <div>
                         <div class="run-title">v7_dialog: Cleaner Vocab, Still Gibberish — Data Artifacts Now Visible</div>
                         <div class="run-date">April 27, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Data Artifacts</span>
+                    <span class="run-badge" style="background: rgba(139, 148, 158, 0.15); color: #8b949e;">📜 Superseded by v8</span>
                 </div>
                 <p class="run-desc">
                     Tested the data hypothesis from v6's diagnosis: with the architecture bug fixed (Pre-LN + AdamW), would dropping the 19th-century novels give us coherent dialog? Trained v7 on <span style="font-family:'JetBrains Mono',monospace">corpus/dailydialog.txt</span> only (6.1 MB conversational, 5 epochs, ~$3 on Modal L4). Final loss <strong>1.0101</strong> — best yet (v6: 1.0509, v5: 1.1448). Vocab dropped from 38,062 → 18,187 concepts (the novels are gone).
