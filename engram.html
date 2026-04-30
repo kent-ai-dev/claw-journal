@@ -351,15 +351,15 @@
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Attention layers</span>
-                    <span class="stat-value">12 (v9)</span>
+                    <span class="stat-value">12 (v10)</span>
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">embed_dim</span>
-                    <span class="stat-value">384 (v9)</span>
+                    <span class="stat-value">384 (v10)</span>
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Brain params</span>
-                    <span class="stat-value">~21.5M (v9)</span>
+                    <span class="stat-value">21,509,761 (v10)</span>
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Vocab</span>
@@ -371,14 +371,14 @@
                 </div>
             </div>
 
-            <p class="arch-note">Active model: <strong>v9_dialog_big</strong> (live 2026-04-28 19:50 UTC). RoPE + Pre-LN + AdamW locked since v6. Vocab cleaned to 9,509 tokens (v8 corpus_clean.py removed numeric IDs and low-frequency tokens). Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
+            <p class="arch-note">Active model: <strong>v10_dialog_corpus</strong> (live 2026-04-29, trained 08:52 UTC). RoPE + Pre-LN + AdamW locked since v6. Vocab 9,509 tokens — same as v9 due to corpus commit bug (see run log). Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
         </div>
     </section>
 
     <!-- Run Log -->
     <section class="run-log-section">
         <h2 class="section-header">Run History</h2>
-        <p class="section-sub">12 runs (+ pre-history) across ~40 days. Architecture stable since v6. Bottleneck shifted: data, not capacity.</p>
+        <p class="section-sub">13 runs (+ pre-history) across ~45 days. Architecture stable since v6. Bottleneck: data — v10 corpus expansion failed to launch due to uncommitted file.</p>
 
         <div class="run-cards">
 
@@ -875,46 +875,99 @@
                 </p>
             </div>
 
-            <!-- v10_dialog_big: in progress -->
-            <div class="run-entry run-active">
+            <!-- v10-redo / v11: next steps, corpus TBD -->
+            <div class="run-entry">
                 <div class="run-meta">
                     <div>
-                        <div class="run-title">v10_dialog_big: Bigger Corpus — Training Pending</div>
-                        <div class="run-date">Apr 28, 2026</div>
+                        <div class="run-title">v10-redo / v11: Next Steps — Corpus TBD</div>
+                        <div class="run-date">Apr 30, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(136, 87, 255, 0.15); color: #a371f7;">🔮 Pending</span>
+                    <span class="run-badge" style="background: rgba(136, 87, 255, 0.15); color: #a371f7;">📋 Plan</span>
                 </div>
                 <p class="run-desc">
-                    v9 proved that 3.5x more parameters on the same corpus does not unlock grammar. The diagnosis is clear: the cleaned dailydialog corpus (~6 MB, ~76K utterances) is too small and too repetitive. v10 keeps the v9 architecture (384D / 12L / 12H / RoPE / Pre-LN / 21.5M params) and merges in <code>HuggingFaceTB/everyday-conversations-llama3.1-2k</code> — clean Llama-generated dialogues downloaded via <code>download_everyday_conversations.py</code> (already in the repo). Kicking off shortly.
+                    The first concrete action is a <strong>v10-redo</strong>: commit <code>everyday_conversations.txt</code> to the repo, verify with <code>git ls-tree HEAD corpus/</code>, then re-run training to actually test the corpus-expansion hypothesis. If vocab_size changes from 9,509 the file was ingested; if it stays identical, something is still wrong. v11 corpus selection is on hold — smol-smoltalk was rejected (instruction-tuning data: system prompts, code generation — wrong distribution), and MultivexAI was only 30 KB of single-sentence utterances. No suitable v11 corpus has been identified yet. Full status: <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Next action</span>
+                        <span class="run-field-value">v10-redo: commit everyday_conversations.txt, verify with git ls-tree, then re-run</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">v11 corpus</span>
+                        <span class="run-field-value">TBD — smol-smoltalk unsuitable (instruction-tuning); MultivexAI too small (30 KB)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Pre-flight rule</span>
+                        <span class="run-field-value">BOOKS files must be in HEAD before Modal launch; verify with git ls-tree HEAD corpus/</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v10_dialog_corpus: corpus bug — effectively a v9 re-run -->
+            <div class="run-entry run-partial">
+                <div class="run-meta">
+                    <div>
+                        <div class="run-title">v10_dialog_corpus: Live — But This Was a v9 Re-Run Due to a Commit Bug</div>
+                        <div class="run-date">Apr 29, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Word Salad (v9 re-run)</span>
+                </div>
+                <p class="run-desc">
+                    v10 was intended to test the corpus-expansion hypothesis — same v9 architecture plus <code>HuggingFaceTB/everyday-conversations-llama3.1-2k</code>. It did not test that. The bug: <code>corpus/everyday_conversations.txt</code> was not committed to GitHub at launch time. Modal training clones the repo, so the file was absent in the container. <code>ingest.py</code> silently filtered it (line 134: <code>corpus_files = [b for b in args.books if os.path.exists(b)]</code>). Result: v10 trained on <code>dailydialog_clean.txt</code> only — identical to v9. Confirmed by vocab_size=9,509 (bit-identical to v9). <strong>$4 of Modal compute wasted on a random-seed re-run.</strong>
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    Eval still shows marginal differences from the different seed. All 16 prompts produce distinct replies (criterion 1 PASS). Mostly real English with some odd tokens like <code>kramer</code>, <code>wisconsin</code>, <code>interpersonal</code> (criterion 2 mostly pass). Fragments slightly more grammatical than v9 but no coherent sentences (criterion 3 FAIL). Sample outputs from <code>eval_runs/chat_20260429_200824.json</code>:
+                    <br><code>"what do you like to do" → "user i have candles possess of the bot situations we have the candles for a"</code>
+                    <br><code>"tell me about yourself" → "user oh seem that is hospitable i sticker possess managers bot it basil be i"</code>
+                    <br><code>"what do you think about love" → "i reeve that user addresses you are residing to make a bot airlines in the"</code>
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    Lesson logged in <code>plans/V11_PLAN.md</code>: "BOOKS files must be in HEAD before launch; verify with <code>git ls-tree HEAD corpus/</code>." Full report: <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
                 </p>
                 <div class="run-fields">
                     <div class="run-field">
                         <span class="run-field-label">Architecture</span>
-                        <span class="run-field-value">Same as v9: 384D / 12L / 12H / RoPE / Pre-LN / AdamW</span>
+                        <span class="run-field-value">384D / 12L / 12H / RoPE / Pre-LN / AdamW</span>
                     </div>
                     <div class="run-field">
-                        <span class="run-field-label">Corpus change</span>
-                        <span class="run-field-value">dailydialog_clean.txt + everyday-conversations-llama3.1-2k</span>
+                        <span class="run-field-label">Brain params</span>
+                        <span class="run-field-value">21,509,761</span>
                     </div>
                     <div class="run-field">
-                        <span class="run-field-label">Hypothesis</span>
-                        <span class="run-field-value">Corpus variety — not capacity — is the binding constraint on grammar</span>
+                        <span class="run-field-label">Vocab</span>
+                        <span class="run-field-value">9,509 — identical to v9 (corpus bug confirmed)</span>
                     </div>
                     <div class="run-field">
-                        <span class="run-field-label">Platform / Cost</span>
-                        <span class="run-field-value">Modal L4 · ~$4–5</span>
+                        <span class="run-field-label">Training</span>
+                        <span class="run-field-value">5 epochs · Modal L4 · $4.00 · 2026-04-29T08:52:00Z</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Corpus (intended)</span>
+                        <span class="run-field-value">dailydialog_clean.txt + everyday_conversations.txt</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Corpus (actual)</span>
+                        <span class="run-field-value">dailydialog_clean.txt only — uncommitted file was absent from Modal container</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Eval</span>
+                        <span class="run-field-value">1/3 criteria: distinct PASS · english mostly · coherent FAIL</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Transcript</span>
+                        <span class="run-field-value"><code>eval_runs/chat_20260429_200824.json</code></span>
                     </div>
                 </div>
             </div>
 
             <!-- v9_dialog_big: bigger model, same corpus, word salad persists -->
-            <div class="run-entry run-partial">
+            <div class="run-entry">
                 <div class="run-meta">
                     <div>
                         <div class="run-title">v9_dialog_big: More Params Did Not Fix Grammar</div>
                         <div class="run-date">Apr 28, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Word Salad</span>
+                    <span class="run-badge" style="background: rgba(139, 148, 158, 0.15); color: #8b949e;">📜 Replaced by v10</span>
                 </div>
                 <p class="run-desc">
                     Trained the biggest Engram model yet: 384 embed dim / 12 layers / 12 heads / head_dim=32 / RoPE / Pre-LN / AdamW — <strong>21.5M brain params</strong> (v8: ~6M, v6: ~6M). Same cleaned dailydialog corpus (9,509-token vocab). 5 epochs on Modal L4, ~$4. Trained 2026-04-28 12:32 UTC, live as of 2026-04-28 19:50 UTC. Full report at <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
