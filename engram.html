@@ -351,19 +351,19 @@
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Attention layers</span>
-                    <span class="stat-value">12 (v10)</span>
+                    <span class="stat-value">12 (v11)</span>
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">embed_dim</span>
-                    <span class="stat-value">384 (v10)</span>
+                    <span class="stat-value">384 (v11)</span>
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Brain params</span>
-                    <span class="stat-value">21,509,761 (v10)</span>
+                    <span class="stat-value">21,509,761 (v11)</span>
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Vocab</span>
-                    <span class="stat-value">9,509 concepts</span>
+                    <span class="stat-value">14,704 concepts</span>
                 </div>
                 <div class="arch-stat">
                     <span class="stat-label">Training platform</span>
@@ -371,14 +371,14 @@
                 </div>
             </div>
 
-            <p class="arch-note">Active model: <strong>v10_dialog_corpus</strong> (live 2026-04-29, trained 08:52 UTC). RoPE + Pre-LN + AdamW locked since v6. Vocab 9,509 tokens — same as v9 due to corpus commit bug (see run log). Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
+            <p class="arch-note">Active model: <strong>v11_dialog_2corpus</strong> (live 2026-05-02, trained 03:55 UTC). RoPE + Pre-LN + AdamW locked since v6. Vocab grew 9,509 → 14,704 — first clean test of corpus expansion. Corpus volume hypothesis refuted; v12 will test the loss function. Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
         </div>
     </section>
 
     <!-- Run Log -->
     <section class="run-log-section">
         <h2 class="section-header">Run History</h2>
-        <p class="section-sub">13 runs (+ pre-history) across ~45 days. Architecture stable since v6. Bottleneck: data — v10 corpus expansion failed to launch due to uncommitted file.</p>
+        <p class="section-sub">14 runs (+ pre-history) across ~45 days. Architecture stable since v6. Corpus-volume hypothesis now refuted (v11). Next test: loss function (v12).</p>
 
         <div class="run-cards">
 
@@ -875,32 +875,20 @@
                 </p>
             </div>
 
-            <!-- v10-redo / v11: next steps, corpus TBD -->
+            <!-- v10-redo / v11: next steps — resolved by v11 -->
             <div class="run-entry">
                 <div class="run-meta">
                     <div>
-                        <div class="run-title">v10-redo / v11: Next Steps — Corpus TBD</div>
+                        <div class="run-title">v10-redo Plan — Resolved by v11_dialog_2corpus</div>
                         <div class="run-date">Apr 30, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(136, 87, 255, 0.15); color: #a371f7;">📋 Plan</span>
+                    <span class="run-badge" style="background: rgba(139, 148, 158, 0.15); color: #8b949e;">📜 Archived</span>
                 </div>
                 <p class="run-desc">
-                    The first concrete action is a <strong>v10-redo</strong>: commit <code>everyday_conversations.txt</code> to the repo, verify with <code>git ls-tree HEAD corpus/</code>, then re-run training to actually test the corpus-expansion hypothesis. If vocab_size changes from 9,509 the file was ingested; if it stays identical, something is still wrong. v11 corpus selection is on hold — smol-smoltalk was rejected (instruction-tuning data: system prompts, code generation — wrong distribution), and MultivexAI was only 30 KB of single-sentence utterances. No suitable v11 corpus has been identified yet. Full status: <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
+                    Plan was to commit <code>everyday_conversations.txt</code> and re-run to actually test corpus expansion.
+                    Executed as v11_dialog_2corpus (trained 2026-05-02). Vocab grew 9,509 → 14,704, confirming both files were ingested.
+                    The corpus-expansion hypothesis was tested cleanly and refuted — see v11 entry below.
                 </p>
-                <div class="run-fields">
-                    <div class="run-field">
-                        <span class="run-field-label">Next action</span>
-                        <span class="run-field-value">v10-redo: commit everyday_conversations.txt, verify with git ls-tree, then re-run</span>
-                    </div>
-                    <div class="run-field">
-                        <span class="run-field-label">v11 corpus</span>
-                        <span class="run-field-value">TBD — smol-smoltalk unsuitable (instruction-tuning); MultivexAI too small (30 KB)</span>
-                    </div>
-                    <div class="run-field">
-                        <span class="run-field-label">Pre-flight rule</span>
-                        <span class="run-field-value">BOOKS files must be in HEAD before Modal launch; verify with git ls-tree HEAD corpus/</span>
-                    </div>
-                </div>
             </div>
 
             <!-- v10_dialog_corpus: corpus bug — effectively a v9 re-run -->
@@ -956,6 +944,66 @@
                     <div class="run-field">
                         <span class="run-field-label">Transcript</span>
                         <span class="run-field-value"><code>eval_runs/chat_20260429_200824.json</code></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v11_dialog_2corpus: first clean corpus-expansion test — refuted -->
+            <div class="run-entry run-partial">
+                <div class="run-meta">
+                    <div>
+                        <div class="run-title">v11_dialog_2corpus: Corpus Expansion Actually Tested This Time — Still Word Salad</div>
+                        <div class="run-date">May 2, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Word Salad (corpus expansion refuted)</span>
+                </div>
+                <p class="run-desc">
+                    v10 was supposed to test the corpus-expansion hypothesis but a commit bug made it a v9 re-run (vocab stayed at 9,509 — the second file was never in the container). v11 fixed all that: both <code>dailydialog_clean.txt</code> and <code>everyday_conversations.txt</code> were committed and verified before launch. <strong>Vocab grew 9,509 → 14,704</strong> — definitive proof both files were ingested. Subprocess timeout was bumped 27,800s → 42,000s (the v11-original failure mode), function timeout 28,800s → 43,200s, and per-epoch checkpointing was added to <code>ingest.py</code> as defense-in-depth. Engram N-gram module size doubled (74.4 MB → 147.6 MB) because <code>NGRAM_TABLE_SIZE</code> was bumped 50,021 → 100,003.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Loss:</strong> epoch 1: 1.1084 · epoch 2: 1.0867 · epoch 3: 1.0749 · epoch 4: ~1.057 · epoch 5: <strong>1.0480</strong>. Comparable to v9/v10 finals (~1.05) despite 55% more vocab to discriminate — consistent with genuine improvement on a harder distribution.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Eval (16 prompts, eval_runs/chat_20260502_195749.json):</strong> Criterion 1 (distinct) PASS — 16/16. Criterion 2 (real English) partial — grammar fragments improved but everyday-conversations introduced brand/proper-noun leakage: <code>ursa, stevia, breville, photoshop, ronaldo</code>. Criterion 3 (coherent chitchat) FAIL — same word salad as v9/v10. Sample outputs:
+                    <br><code>"what do you like to do" → "bot i think stimulation spaceship the i can photoshop deformity the bot stimulation for a"</code>
+                    <br><code>"tell me about yourself" → "bot bald is i think the a unknown that carmichael i can photoshop bombs the"</code>
+                    <br><code>"do you have any friends" → "bot i don resolved the it s my unknown of the you foodborne it user"</code>
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Notable signal:</strong> <code>avg_ponder</code> collapsed from 3.0 (all prior models, always ran the full loop) to <strong>1.0</strong> — the halt gate now terminates after 1 step. Bigger vocab gives sharper predictions. Didn't translate to coherence. <strong>Corpus-volume hypothesis refuted.</strong> v9 (capacity) and v11 (corpus) both failed at the same level. The remaining hypothesis is the loss function: MSE on embeddings rewards predicting the average of plausible tokens; v12 will switch to softmax cross-entropy. Full report: <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Architecture</span>
+                        <span class="run-field-value">384D / 12L / 12H / RoPE / Pre-LN / AdamW (frozen since v9)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Brain params</span>
+                        <span class="run-field-value">21,509,761</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Vocab</span>
+                        <span class="run-field-value">14,704 (was 9,509 — corpus expansion confirmed)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Corpus</span>
+                        <span class="run-field-value">dailydialog_clean.txt + everyday_conversations.txt (5.3 MB)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Training</span>
+                        <span class="run-field-value">5 epochs · Modal L4 · 11h08m · $6 · 2026-05-02T03:55:00Z</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Final loss</span>
+                        <span class="run-field-value">1.0480</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Eval</span>
+                        <span class="run-field-value">1/3 criteria: distinct PASS · english partial · coherent FAIL</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Transcript</span>
+                        <span class="run-field-value"><code>eval_runs/chat_20260502_195749.json</code></span>
                     </div>
                 </div>
             </div>
