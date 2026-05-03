@@ -371,14 +371,14 @@
                 </div>
             </div>
 
-            <p class="arch-note">Active model: <strong>v11_dialog_2corpus</strong> (live 2026-05-02, trained 03:55 UTC). RoPE + Pre-LN + AdamW locked since v6. Vocab grew 9,509 → 14,704 — first clean test of corpus expansion. Corpus volume hypothesis refuted; v12 will test the loss function. Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
+            <p class="arch-note">Active model: <strong>v12_xent</strong> (live 2026-05-03). RoPE + Pre-LN + AdamW + cosine cross-entropy tied projection (INV_TEMP=10). Vocab 14,704, 21.5M brain params. Loss function swapped from MSE; training functioning but still incoherent — INV_TEMP=10 too flat. v13 queued: bump INV_TEMP to 30+. Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
         </div>
     </section>
 
     <!-- Run Log -->
     <section class="run-log-section">
         <h2 class="section-header">Run History</h2>
-        <p class="section-sub">14 runs (+ pre-history) across ~45 days. Architecture stable since v6. Corpus-volume hypothesis now refuted (v11). Next test: loss function (v12).</p>
+        <p class="section-sub">15 runs (+ pre-history) across ~45 days. Architecture stable since v6. Corpus-volume hypothesis refuted (v11). Loss-function class tested (v12, cross-entropy). Next test: temperature calibration (v13, INV_TEMP 10 → 30+).</p>
 
         <div class="run-cards">
 
@@ -955,7 +955,7 @@
                         <div class="run-title">v11_dialog_2corpus: Corpus Expansion Actually Tested This Time — Still Word Salad</div>
                         <div class="run-date">May 2, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Word Salad (corpus expansion refuted)</span>
+                    <span class="run-badge" style="background: rgba(139, 148, 158, 0.15); color: #8b949e;">📜 Replaced by v12</span>
                 </div>
                 <p class="run-desc">
                     v10 was supposed to test the corpus-expansion hypothesis but a commit bug made it a v9 re-run (vocab stayed at 9,509 — the second file was never in the container). v11 fixed all that: both <code>dailydialog_clean.txt</code> and <code>everyday_conversations.txt</code> were committed and verified before launch. <strong>Vocab grew 9,509 → 14,704</strong> — definitive proof both files were ingested. Subprocess timeout was bumped 27,800s → 42,000s (the v11-original failure mode), function timeout 28,800s → 43,200s, and per-epoch checkpointing was added to <code>ingest.py</code> as defense-in-depth. Engram N-gram module size doubled (74.4 MB → 147.6 MB) because <code>NGRAM_TABLE_SIZE</code> was bumped 50,021 → 100,003.
@@ -1004,6 +1004,75 @@
                     <div class="run-field">
                         <span class="run-field-label">Transcript</span>
                         <span class="run-field-value"><code>eval_runs/chat_20260502_195749.json</code></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v12_xent: loss-function swap — cross-entropy tested, still incoherent at INV_TEMP=10 -->
+            <div class="run-entry run-partial">
+                <div class="run-meta">
+                    <div>
+                        <div class="run-title">v12_xent: Cross-Entropy Loss Swap — Training Works, Output Still Incoherent</div>
+                        <div class="run-date">May 3, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Word Salad (INV_TEMP=10 too flat)</span>
+                </div>
+                <p class="run-desc">
+                    Single-variable swap from v11: training loss changed from MSE-on-embeddings to <strong>temperature-scaled cosine cross-entropy via tied output projection</strong> (<code>predicted_norm @ vocab_matrix_normed.T * INV_TEMP=10</code>). Architecture and corpus identical to v11 (12L / 384D / 12H / RoPE / Pre-LN / AdamW, 21.5M brain params, 38.7M engram params, vocab 14,704, context 32, 5.3 MB corpus). The v6–v11-era <code>coherence_penalty</code> MSE hack was dropped. <code>vocab_matrix_global</code> refreshed from the drifting <code>embed_cache</code> each epoch. Trained 2026-05-03 on Modal L4, $6.00.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Loss (cross-entropy — not comparable to v11's MSE 1.05):</strong> epoch 1: 8.16 · epoch 2: 8.00 · epoch 3: 7.74 · epoch 4: 7.54 · epoch 5: <strong>7.38</strong>. Steady ~−0.2 nats/epoch — training is functioning. Theoretical floor at INV_TEMP=10: ≈1.77 nats. The model has 5.6 nats of headroom and isn't closing it.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Eval (eval_runs/chat_20260503_165046.json):</strong> Model is not collapsed — replies differ per prompt. Dialog scaffolding tokens appear (<code>user</code>, <code>bot</code>, <code>i</code>, <code>you</code>; occasional bigrams like "i'm not going", "i ll go to"). But no coherent sentences. Sample outputs:
+                    <br><code>"hello" → "user do fragrance that are of be curb cortina what is it typical good the"</code>
+                    <br><code>"hi how are you" → "and me cgi slim a and to course unnecessary tailors i think illness but you"</code>
+                    <br><code>"tell me about yourself" → "user yes it lasts you are not sure dump rica bot you vegetables are the"</code>
+                    <br><code>"what is the capital of france" → "and concentrate bot tools i have a unk sara grandfather is my canvas and i"</code>
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Assessment:</strong> the loss-function hypothesis is partly supported. Cross-entropy trains cleanly and dialog-turn structure is visible in output — progress over raw MSE word-salad. The bottleneck is now temperature calibration: at INV_TEMP=10 the softmax is too flat to force lexical commitment. <strong>v13 queued: bump INV_TEMP to 30+.</strong> Theoretical floor at INV_TEMP=30 is ≈0.59 nats — 3× sharper gradient signal per step. Full report: <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Architecture</span>
+                        <span class="run-field-value">384D / 12L / 12H / RoPE / Pre-LN / AdamW (frozen since v9)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Loss function</span>
+                        <span class="run-field-value">cosine cross-entropy · tied output projection · INV_TEMP=10</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Brain params</span>
+                        <span class="run-field-value">21,509,761</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Vocab</span>
+                        <span class="run-field-value">14,704 (unchanged from v11)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Corpus</span>
+                        <span class="run-field-value">dailydialog_clean.txt + everyday_conversations.txt (5.3 MB)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Training</span>
+                        <span class="run-field-value">5 epochs · Modal L4 · $6.00 · 2026-05-03</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Final loss</span>
+                        <span class="run-field-value">7.379 nats (floor ≈1.77 at INV_TEMP=10)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Eval</span>
+                        <span class="run-field-value">distinct PASS · dialog-scaffolding partial · coherent FAIL</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Transcript</span>
+                        <span class="run-field-value"><code>eval_runs/chat_20260503_165046.json</code></span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Commit</span>
+                        <span class="run-field-value"><code>e281458</code></span>
                     </div>
                 </div>
             </div>
