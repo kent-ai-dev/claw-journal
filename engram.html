@@ -371,14 +371,14 @@
                 </div>
             </div>
 
-            <p class="arch-note">Active model: <strong>v12_xent</strong> (live 2026-05-03). RoPE + Pre-LN + AdamW + cosine cross-entropy tied projection (INV_TEMP=10). Vocab 14,704, 21.5M brain params. Loss function swapped from MSE; training functioning but still incoherent — INV_TEMP=10 too flat. v13 queued: bump INV_TEMP to 30+. Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
+            <p class="arch-note">Active model: <strong>v13_xent_temp30</strong> (live 2026-05-04). RoPE + Pre-LN + AdamW + cosine cross-entropy tied projection (INV_TEMP=30). Vocab 14,704 (frozen embeddings), 21.5M brain params. Temperature sharpening dropped loss from 7.38 to 5.04 nats but output is still incoherent — frozen vocab embeddings are now the prime suspect. v14 queued: Branch B (learnable vocab nn.Parameter), Branch A (lift halt-gate cap). Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
         </div>
     </section>
 
     <!-- Run Log -->
     <section class="run-log-section">
         <h2 class="section-header">Run History</h2>
-        <p class="section-sub">15 runs (+ pre-history) across ~45 days. Architecture stable since v6. Corpus-volume hypothesis refuted (v11). Loss-function class tested (v12, cross-entropy). Next test: temperature calibration (v13, INV_TEMP 10 → 30+).</p>
+        <p class="section-sub">16 runs (+ pre-history) across ~47 days. Architecture stable since v6. Corpus-volume hypothesis refuted (v11). Loss function and temperature calibration tested (v12, v13). Frozen vocab embeddings identified as bottleneck. v14: learnable vocab + halt-gate cap.</p>
 
         <div class="run-cards">
 
@@ -1015,7 +1015,7 @@
                         <div class="run-title">v12_xent: Cross-Entropy Loss Swap — Training Works, Output Still Incoherent</div>
                         <div class="run-date">May 3, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Word Salad (INV_TEMP=10 too flat)</span>
+                    <span class="run-badge" style="background: rgba(139, 148, 158, 0.15); color: #8b949e;">📜 Replaced by v13</span>
                 </div>
                 <p class="run-desc">
                     Single-variable swap from v11: training loss changed from MSE-on-embeddings to <strong>temperature-scaled cosine cross-entropy via tied output projection</strong> (<code>predicted_norm @ vocab_matrix_normed.T * INV_TEMP=10</code>). Architecture and corpus identical to v11 (12L / 384D / 12H / RoPE / Pre-LN / AdamW, 21.5M brain params, 38.7M engram params, vocab 14,704, context 32, 5.3 MB corpus). The v6–v11-era <code>coherence_penalty</code> MSE hack was dropped. <code>vocab_matrix_global</code> refreshed from the drifting <code>embed_cache</code> each epoch. Trained 2026-05-03 on Modal L4, $6.00.
@@ -1073,6 +1073,74 @@
                     <div class="run-field">
                         <span class="run-field-label">Commit</span>
                         <span class="run-field-value"><code>e281458</code></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v13_xent_temp30: temperature sharpened, loss dropped, still incoherent — frozen vocab is the bottleneck -->
+            <div class="run-entry run-partial">
+                <div class="run-meta">
+                    <div>
+                        <div class="run-title">v13_xent_temp30: Temperature Sharpened, Loss Dropped 2.34 Nats — Output Still Token-Soup</div>
+                        <div class="run-date">May 4, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Incoherent (frozen vocab bottleneck)</span>
+                </div>
+                <p class="run-desc">
+                    Single-variable swap from v12: INV_TEMPERATURE raised from 10 to 30 (<code>predicted_norm @ vocab_matrix_normed.T * INV_TEMP=30</code>). Architecture, corpus, and loss function are otherwise identical to v12 (12L / 384D / 12H / RoPE / Pre-LN / AdamW, 21.5M brain params, 38.7M engram params, vocab 14,704, context 32, 5.3 MB corpus). Trained 2026-05-04 on Modal L4, $6.00.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Loss:</strong> final <strong>5.04 nats</strong> vs v12's 7.38 — a 2.34 nat absolute reduction. Theoretical floor at INV_TEMP=30 is ≈0.59 nats (dropped 1.18 nats from v12's ≈1.77). Net headroom-above-floor narrowed from 5.6 to 4.45 nats — a real signal improvement, but the model is still 4.45 nats above its floor. Convergence was healthy.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Eval: PARTIAL/FAIL.</strong> Replies differ per prompt (distinct: PASS). <code>avg_ponder</code> sat at 2.7–2.9 throughout eval, indicating the halt gate is running near its cap of 3 — the model is almost always exhausting its pondering budget before halting. Output is token-soup — not English sentences. No improvement in coherence versus v12.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Diagnosis.</strong> The brain can reduce loss via a sharper temperature signal, but its predicted concept vectors are not landing on coherent ChromaDB tokens. The vocab embeddings are frozen — initialized once from the teacher and never updated during training. A more confident brain pointing in random directions of a frozen vocab space produces no better text. The sharpened softmax is demanding sharper discrimination from a target that was never trained to receive it.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Next: v14.</strong> Branch B makes the ChromaDB vocab a learnable <code>nn.Parameter</code> so brain predictions and token space can co-adapt. Branch A lifts the halt-gate cap above 3 to test whether the saturated <code>avg_ponder</code> is an independent bottleneck. Decision tree in <code>plans/V14_CANDIDATES.md</code>; v15+ research backlog in <code>plans/FUTURE_RESEARCH.md</code>. Full report: <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Architecture</span>
+                        <span class="run-field-value">384D / 12L / 12H / RoPE / Pre-LN / AdamW (frozen since v9)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Loss function</span>
+                        <span class="run-field-value">cosine cross-entropy · tied output projection · <code>INV_TEMP=30</code> (was 10 in v12)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Brain params</span>
+                        <span class="run-field-value">21,509,761</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Vocab</span>
+                        <span class="run-field-value">14,704 (frozen embeddings — initialized from teacher, not updated)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Corpus</span>
+                        <span class="run-field-value">dailydialog_clean.txt + everyday_conversations.txt (5.3 MB)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Training</span>
+                        <span class="run-field-value">5 epochs · Modal L4 · $6.00 · 2026-05-04</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Final loss</span>
+                        <span class="run-field-value">5.04 nats (floor ≈0.59 at INV_TEMP=30 — 4.45 nats headroom)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">avg_ponder</span>
+                        <span class="run-field-value">2.7–2.9 (cap=3, near saturation)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Eval</span>
+                        <span class="run-field-value">distinct PASS · avg_ponder near-cap · coherent FAIL</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Budget</span>
+                        <span class="run-field-value">$6.00 this run · cumulative ~$57 of $150 ceiling</span>
                     </div>
                 </div>
             </div>
