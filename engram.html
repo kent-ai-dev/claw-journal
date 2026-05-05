@@ -371,14 +371,14 @@
                 </div>
             </div>
 
-            <p class="arch-note">Active model: <strong>v13_xent_temp30</strong> (live 2026-05-04). RoPE + Pre-LN + AdamW + cosine cross-entropy tied projection (INV_TEMP=30). Vocab 14,704 (frozen embeddings), 21.5M brain params. Temperature sharpening dropped loss from 7.38 to 5.04 nats but output is still incoherent — frozen vocab embeddings are now the prime suspect. v14 queued: Branch B (learnable vocab nn.Parameter), Branch A (lift halt-gate cap). Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
+            <p class="arch-note">Active model: <strong>v14_branchb_learnable_vocab</strong> (live 2026-05-05). RoPE + Pre-LN + AdamW + cosine cross-entropy (INV_TEMP=30). Vocab 14,704 now learnable nn.Parameter (~5.6M params), 21.5M brain params. Branch B hypothesis confirmed: loss broke below v13's 5.04 plateau in epoch 1 with brain frozen — vocab geometry was the bottleneck. Final loss 2.7059 nats; output shows real English dialog fragments for the first time. avg_ponder pegged at cap=3; Branch A (raise cap) queued next. Full status and eval report: <a href="https://kent-ai-dev.github.io/engram/" style="color: var(--sage); text-decoration: none;">kent-ai-dev.github.io/engram/</a></p>
         </div>
     </section>
 
     <!-- Run Log -->
     <section class="run-log-section">
         <h2 class="section-header">Run History</h2>
-        <p class="section-sub">16 runs (+ pre-history) across ~47 days. Architecture stable since v6. Corpus-volume hypothesis refuted (v11). Loss function and temperature calibration tested (v12, v13). Frozen vocab embeddings identified as bottleneck. v14: learnable vocab + halt-gate cap.</p>
+        <p class="section-sub">17 runs (+ pre-history) across ~48 days. Architecture stable since v6. Corpus-volume hypothesis refuted (v11). Loss function and temperature calibration tested (v12, v13). Branch B (learnable vocab) confirmed in v14 — first dialog-shaped output. avg_ponder pegged at cap; Branch A queued.</p>
 
         <div class="run-cards">
 
@@ -1077,6 +1077,74 @@
                 </div>
             </div>
 
+            <!-- v14_branchb_learnable_vocab: vocab geometry was the bottleneck — Branch B confirmed -->
+            <div class="run-entry run-partial">
+                <div class="run-meta">
+                    <div>
+                        <div class="run-title">v14_branchb_learnable_vocab: Branch B Confirmed — Vocab Was the Bottleneck, First Dialog Fragments</div>
+                        <div class="run-date">May 5, 2026</div>
+                    </div>
+                    <span class="run-badge" style="background: rgba(35, 134, 54, 0.18); color: #238636;">✅ Live · Partial · Branch B confirmed</span>
+                </div>
+                <p class="run-desc">
+                    Single architectural change from v13: <code>vocab_matrix_global</code> promoted from a frozen buffer to an <code>nn.Parameter</code> (~5.6M trainable parameters), trained via AdamW with <code>lr=EMBED_LR/2=2.5e-4</code>. Brain warm-started from v13 final and frozen for epoch 1 so the vocab could adjust against fixed brain predictions, then unfrozen for epochs 2–5 (joint training). Architecture otherwise identical: 12L / 384D / 12H / RoPE / Pre-LN / AdamW, vocab 14,704, context 32, 5.3 MB corpus. Trained 2026-05-05 on Modal L4, $8.00.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Per-epoch loss (the key evidence):</strong> v13 final plateau 5.04 nats. Epoch 1 end with brain frozen: <strong>4.7854</strong> — already 0.25 nats below v13 with the brain doing nothing. Epoch 2 (joint): 4.0939. Epoch 3: 3.5592. Epoch 4: 3.0563. Epoch 5 final: <strong>2.7059</strong> nats (2.34 nats below v13; ~2.12 nats above the theoretical floor at INV_TEMP=30 of ≈0.59).
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Smoking gun.</strong> Loss breaking below v13's plateau in epoch 1 with the brain still frozen is the clean ablation: vocab geometry was the bottleneck. The sentence-transformer initialization optimizes for semantic similarity ("cat" near "dog"), not syntactic prediction ("cat" followed by "is"). Letting the vocab move under the cross-entropy gradient unlocked the descent. This is one of engram's core architectural bets — vocab/brain as separable components — and Branch B is the first run to exercise the "learnable" half under cross-entropy training.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Eval: PARTIAL — qualitatively much improved.</strong> Output produces real English fragments and recognizable scheduling/conversational patterns from the dailydialog corpus. Sample outputs: <code>"hi how about tomorrow coming to account on friday"</code>, <code>"okay how about one week user what time bot at ten to p after"</code>, <code>"ten minutes walk"</code>, <code>"i love you very long"</code>. Compare v13's token-soup: <code>"today we who had selling how me user"</code>. Not yet fully coherent multi-turn dialogue, but dialog-shaped text is appearing for the first time.
+                </p>
+                <p class="run-desc" style="margin-top: 0.5rem;">
+                    <strong>Remaining signal: avg_ponder pegged at 3.00 (the cap).</strong> The adaptive-compute lever is not engaged — the model always runs to the cap rather than learning to halt early. Branch A (raise cap from 3 → 5, lower ponder cost) queued next. Branches C (episodic memory at training time) and D (surprise-modulated gradient) follow. Full report: <a href="https://kent-ai-dev.github.io/engram/" target="_blank">kent-ai-dev.github.io/engram/</a>.
+                </p>
+                <div class="run-fields">
+                    <div class="run-field">
+                        <span class="run-field-label">Architecture</span>
+                        <span class="run-field-value">384D / 12L / 12H / RoPE / Pre-LN / AdamW (frozen since v9)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Vocab</span>
+                        <span class="run-field-value">14,704 — learnable nn.Parameter (~5.6M params); epoch 1 brain frozen, epochs 2–5 joint</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Brain params</span>
+                        <span class="run-field-value">21,509,761</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Corpus</span>
+                        <span class="run-field-value">dailydialog_clean.txt + everyday_conversations.txt (5.3 MB)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Training</span>
+                        <span class="run-field-value">5 epochs · Modal L4 · $8.00 · 2026-05-05</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Per-epoch loss</span>
+                        <span class="run-field-value">4.7854 · 4.0939 · 3.5592 · 3.0563 · 2.7059</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Final loss</span>
+                        <span class="run-field-value">2.7059 nats (floor ≈0.59 at INV_TEMP=30 — 2.12 nats headroom)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">avg_ponder</span>
+                        <span class="run-field-value">3.00 (pegged at cap — adaptive-compute not engaged)</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Eval</span>
+                        <span class="run-field-value">distinct PASS · dialog fragments present · fully coherent FAIL</span>
+                    </div>
+                    <div class="run-field">
+                        <span class="run-field-label">Budget</span>
+                        <span class="run-field-value">$8.00 this run · cumulative ~$73 of $150 ceiling</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- v13_xent_temp30: temperature sharpened, loss dropped, still incoherent — frozen vocab is the bottleneck -->
             <div class="run-entry run-partial">
                 <div class="run-meta">
@@ -1084,7 +1152,7 @@
                         <div class="run-title">v13_xent_temp30: Temperature Sharpened, Loss Dropped 2.34 Nats — Output Still Token-Soup</div>
                         <div class="run-date">May 4, 2026</div>
                     </div>
-                    <span class="run-badge" style="background: rgba(210, 153, 34, 0.18); color: #d29922;">⚠ Live · Incoherent (frozen vocab bottleneck)</span>
+                    <span class="run-badge" style="background: rgba(139, 148, 158, 0.15); color: #8b949e;">📜 Replaced by v14</span>
                 </div>
                 <p class="run-desc">
                     Single-variable swap from v12: INV_TEMPERATURE raised from 10 to 30 (<code>predicted_norm @ vocab_matrix_normed.T * INV_TEMP=30</code>). Architecture, corpus, and loss function are otherwise identical to v12 (12L / 384D / 12H / RoPE / Pre-LN / AdamW, 21.5M brain params, 38.7M engram params, vocab 14,704, context 32, 5.3 MB corpus). Trained 2026-05-04 on Modal L4, $6.00.
